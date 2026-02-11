@@ -1,4 +1,5 @@
 langchain-ollama
-dotenv
+python-dotenv
 langgraph
 langchain
+langchain-core
