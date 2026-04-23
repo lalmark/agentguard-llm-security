@@ -1,56 +1,73 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# Read model name from .env, default to 'llama2'
-MODEL_NAME = os.getenv('MODEL_NAME', 'llama2')
+import requests
+from pathlib import Path
+from typing import Dict, Any
 
 
-def _prompt_to_text(prompt) -> str:
-	"""Normalize different prompt formats to plain text."""
-	try:
-		if isinstance(prompt, (list, tuple)):
-			return "\n".join(
-				[m.get("content", "") if isinstance(m, dict) else str(m) for m in prompt]
-			)
-		if isinstance(prompt, dict):
-			return prompt.get("input", "")
-		return str(prompt)
-	except Exception:
-		return str(prompt)
+class Llama2Wrapper:
+    def __init__(
+        self,
+        model: str = "llama2",
+        host: str = "http://localhost:11434"
+    ):
+        self.model = model
+        self.host = host
 
+        self.base_path = Path(__file__).parent / "prompts"
 
-class MockLLM:
-	def invoke(self, prompt):
-		text = _prompt_to_text(prompt).lower()
-		if any(tok in text for tok in ["rm -rf", "sudo", "chmod 777", "kill -9"]):
-			return "⚠️ MOCK RESPONSE: Обнаружена опасная команда. Выполнение заблокировано."
-		return "✅ MOCK RESPONSE: LLM недоступен — это безопасный ответ-фолбэк."
+    # =========================
+    # 📄 load prompt
+    # =========================
+    def _load_prompt(self, filename: str) -> str:
+        path = self.base_path / filename
+        return path.read_text(encoding="utf-8")
 
+    # =========================
+    # 🧠 base generation
+    # =========================
+    def _generate(self, system_prompt: str, user_input: str) -> str:
+        prompt = f"[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n{user_input}\n[/INST]"
 
-# Try to import and wrap real Ollama client; on any failure use MockLLM.
-try:
-	from langchain_ollama.llms import OllamaLLM
-	from app.config import settings
+        response = requests.post(
+            f"{self.host}/api/generate",
+            json={
+                "model": self.model,
+                "prompt": prompt,
+                "stream": False
+            }
+        )
 
-	class SafeLLM:
-		def __init__(self, inner):
-			self._inner = inner
+        return response.json().get("response", "").strip()
 
-		def invoke(self, prompt):
-			try:
-				# Prefer the underlying LLM's invoke/generate
-				return self._inner.invoke(prompt)
-			except Exception:
-				# On runtime failure (e.g. Ollama server not reachable) fall back
-				return MockLLM().invoke(prompt)
+    # =========================
+    # 🧭 router (decision making)
+    # =========================
+    def route(self, user_input: str) -> str:
+        system = self._load_prompt("router_prompt.txt")
+        result = self._generate(system, user_input)
+        return result.lower().strip()
 
-	try:
-		real_llm = OllamaLLM(model=settings.MODEL_NAME)
-		llm_model = SafeLLM(real_llm)
-	except Exception:
-		llm_model = MockLLM()
+    # =========================
+    # 🧠 planner (reasoning)
+    # =========================
+    def plan(self, user_input: str) -> str:
+        system = self._load_prompt("system_prompt.txt")
+        return self._generate(system, user_input)
 
-except Exception:
-	llm_model = MockLLM()
+    # =========================
+    # 🛡 security classifier
+    # =========================
+    def security_check(self, user_input: str) -> Dict[str, Any]:
+        system = self._load_prompt("security_prompt.txt")
+        result = self._generate(system, user_input).lower()
+
+        return {
+            "raw": result,
+            "is_safe": "safe" in result or "yes" in result
+        }
+
+    # =========================
+    # 💬 general call (fallback)
+    # =========================
+    def call(self, user_input: str) -> str:
+        system = self._load_prompt("system_prompt.txt")
+        return self._generate(system, user_input)
