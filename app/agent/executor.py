@@ -25,7 +25,6 @@ class AgentExecutor:
             "messages": [
                 HumanMessage(content=user_input)
             ],
-            "is_safe": True,
             "security_flags": []
         }
 
@@ -37,7 +36,6 @@ class AgentExecutor:
 
         # ⚙️ 3. EXECUTE GRAPH
         final_state = self.graph.invoke(initial_state, config=config)
-        print(final_state)
 
         # 📦 4. GET OUTPUT
         if final_state.get("final_answer"):

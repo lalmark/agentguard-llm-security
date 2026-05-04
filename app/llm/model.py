@@ -26,6 +26,7 @@ class Llama2Wrapper:
     # =========================
     def _generate(self, system_prompt: str, user_input: str) -> str:
         prompt = f"[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n{user_input}\n[/INST]"
+        # prompt = f"[INST]\n{user_input}\n[/INST]"
 
         response = requests.post(
             f"{self.host}/api/generate",
@@ -51,7 +52,7 @@ class Llama2Wrapper:
     # =========================
     def plan(self, user_input: str) -> str:
         system = self._load_prompt("system_prompt.txt")
-        return self._generate(system, user_input)
+        return self._generate('', user_input)
 
     # =========================
     # 🛡 security classifier

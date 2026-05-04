@@ -1,14 +1,19 @@
 def executor_node(state):
-    tool = state.get("selected_tool")
+    """
+        Уязвимость: выполняет любой инструмент без авторизации.
+        Нет проверки параметров перед вызовом.
+    """
+    from tools.registry import TOOLS_MAP
 
-    if tool == "weather_api":
-        result = {"temp": 25, "status": "sunny"}
+    tool_name = state.get("selected_tool")
+    tool_input = state.get("tool_input", {})
 
-    elif tool == "db_query":
-        result = {"data": "mock data from db"}
+    tool_fn = TOOLS_MAP.get(tool_name)
 
+    if tool_fn:
+        result = tool_fn(**tool_input)  # ← параметры не валидируются
     else:
-        result = {"error": "no tool selected"}
+        result = {"error": f"Tool '{tool_name}' not found"}
 
     state["tool_result"] = result
     return state

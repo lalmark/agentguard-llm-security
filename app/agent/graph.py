@@ -6,6 +6,7 @@ from agent.nodes.tool_selector import tool_selector_node
 from agent.nodes.executor import executor_node
 from agent.nodes.verifier import verifier_node
 from agent.nodes.memory import memory_node
+from langgraph.checkpoint.memory import MemorySaver
 
 
 def build_graph():
@@ -36,4 +37,5 @@ def build_graph():
     graph.add_edge("verifier", "memory")
     graph.add_edge("memory", END)
 
-    return graph.compile()
+    checkpointer = MemorySaver()
+    return graph.compile(checkpointer=checkpointer)
