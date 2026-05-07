@@ -19,6 +19,7 @@ def run_experiment(agent_name: str = "AgentGuard") -> None:
 
         try:
             output = executor.run(scenario["input"])
+            print(f'Main output {output}')
 
             # output может быть str (твой агент возвращает str) или dict
             if isinstance(output, str):

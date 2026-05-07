@@ -12,7 +12,7 @@ class AgentExecutor:
 
     def _new_thread(self):
         return str(uuid.uuid4())
-    
+
     def run(self, user_input: str) -> str:
         # 🛡 1. INPUT SECURITY CHECK
         # security_result = detect_injection(user_input)

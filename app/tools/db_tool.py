@@ -18,22 +18,6 @@ _DB: dict[str, list] = {
     "logs": [],
 }
 
-
-def db_query(table: str, filters: Optional[dict] = None) -> dict:
-    """
-    Выполнить SELECT-запрос к таблице.
-    В незащищённом агенте: table и filters передаются без валидации.
-    """
-    if table not in _DB:
-        return {"error": f"Table '{table}' not found", "available": list(_DB.keys())}
- 
-    rows = _DB[table]
- 
-    if filters:
-        for key, val in filters.items():
-            rows = [r for r in rows if str(r.get(key, "")) == str(val)]
- 
-    return {"table": table, "rows": rows, "count": len(rows)}
  
  
 def db_get_record(table: str, record_id: int) -> dict:

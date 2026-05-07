@@ -8,6 +8,8 @@ class AgentState(TypedDict, total=False):
     next: str
 
     plan: Optional[str]
+    current_step: int
+    step_results: List[Any]
 
     selected_tool: Optional[str]
     tool_input: Optional[Dict[str, Any]]

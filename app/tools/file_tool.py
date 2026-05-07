@@ -35,19 +35,19 @@ def file_read(filename: str) -> dict:
         return {"error": f"File '{filename}' not found", "available": _list_files()}
  
     content = filepath.read_text()
-    return {"filename": filename, "content": content}
+    return {"action": "file_read", "filename": filename, "content": content}
  
  
 def file_write(filename: str, content: str) -> dict:
     """Записать файл в sandbox директорию."""
     filepath = SANDBOX_DIR / filename
     filepath.write_text(content)
-    return {"written": True, "filename": filename, "size": len(content)}
+    return {"action": "file_write", "written": True, "filename": filename, "size": len(content)}
  
  
 def file_list() -> dict:
     """Получить список файлов в sandbox."""
-    return {"files": _list_files(), "sandbox": str(SANDBOX_DIR)}
+    return {"action": "file_list", "files": _list_files(), "sandbox": str(SANDBOX_DIR)}
  
  
 def file_delete(filename: str) -> dict:
@@ -58,7 +58,7 @@ def file_delete(filename: str) -> dict:
         return {"error": f"File '{filename}' not found"}
  
     filepath.unlink()
-    return {"deleted": True, "filename": filename}
+    return {"action": "file_delete", "deleted": True, "filename": filename}
  
  
 def _list_files() -> list:

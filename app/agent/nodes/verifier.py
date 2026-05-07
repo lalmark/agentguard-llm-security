@@ -1,5 +1,6 @@
 from llm.model import Llama2Wrapper
 from langchain_core.messages import AIMessage
+import json
 
 llm = Llama2Wrapper()
 
@@ -8,30 +9,22 @@ def verifier_node(state):
         В НЕЗАЩИЩЁННОМ агенте: просто формирует финальный ответ.
         Нет проверки безопасности действия.
     """
-    # user_input = state["messages"][-1].content.lower()
-    # result = llm.security_check(user_input)
-
-    # state["is_safe"] = result["is_safe"]
-    # state["security_flags"] = [result["raw"]]
-
-    # print('Verifier')
-    # print('Input', user_input)
-    # print('Output', result)
-
-    # if not state["is_safe"]:
-    #     state["final_answer"] = "Blocked due to security policy"
-
     tool_result = state.get("tool_result")
-    plan = state.get("plan")
+    step_results = state.get("step_results", [])
 
-    if tool_result:
-        answer = f"Tool result: {tool_result}"
-    elif plan:
-        answer = plan
+    if step_results:
+        results = step_results
+    elif tool_result:
+        results = [tool_result]
     else:
-        answer = "Done"
+        results = []
 
-    state["final_answer"] = answer
-    state["messages"] = state["messages"] + [AIMessage(content=answer)]
+    if results:
+        answer_str = json.dumps(results, ensure_ascii=False, indent=2)
+    else:
+        answer_str = "Готово."
+
+    state["final_answer"] = results
+    state["messages"] = state["messages"] + [AIMessage(content=answer_str)]
 
     return state

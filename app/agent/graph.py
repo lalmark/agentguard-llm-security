@@ -9,6 +9,15 @@ from agent.nodes.memory import memory_node
 from langgraph.checkpoint.memory import MemorySaver
 
 
+def _has_more_steps(state) -> str:
+    plan = state.get("plan") or []
+    current_step = state.get("current_step", 0)
+
+    if plan and current_step < len(plan):
+        return "next_step"
+    return "done"
+
+
 def build_graph():
     graph = StateGraph(AgentState)
 
@@ -25,15 +34,23 @@ def build_graph():
         "router",
         lambda state: state.get("next", "planner"),
         {
-            "planner": "planner",
+            "plan": "planner",
             "tool": "tool_selector",
             "direct": "verifier",
         }
     )
-
-    graph.add_edge("planner", "verifier")
+    graph.add_edge("planner", "tool_selector")
     graph.add_edge("tool_selector", "executor")
-    graph.add_edge("executor", "verifier")
+
+    graph.add_conditional_edges(
+        "executor",
+        _has_more_steps,
+        {
+            "next_step": "tool_selector",  # ← цикл
+            "done": "verifier",
+        }
+    )
+
     graph.add_edge("verifier", "memory")
     graph.add_edge("memory", END)
 

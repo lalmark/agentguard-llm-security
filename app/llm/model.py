@@ -6,7 +6,7 @@ from typing import Dict, Any
 class Llama2Wrapper:
     def __init__(
         self,
-        model: str = "llama2",
+        model: str = "llama3.2:3b",
         host: str = "http://localhost:11434"
     ):
         self.model = model
@@ -26,7 +26,6 @@ class Llama2Wrapper:
     # =========================
     def _generate(self, system_prompt: str, user_input: str) -> str:
         prompt = f"[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n{user_input}\n[/INST]"
-        # prompt = f"[INST]\n{user_input}\n[/INST]"
 
         response = requests.post(
             f"{self.host}/api/generate",
@@ -51,8 +50,22 @@ class Llama2Wrapper:
     # 🧠 planner (reasoning)
     # =========================
     def plan(self, user_input: str) -> str:
-        system = self._load_prompt("system_prompt.txt")
-        return self._generate('', user_input)
+        system = self._load_prompt("planner_prompt.txt")
+        return self._generate(system, user_input)
+
+    # =========================
+    # 🧠 tool selector (action)
+    # =========================
+    def tool_selector(self, user_input: str) -> str:
+        system = self._load_prompt("tools_prompt.txt")
+        return self._generate(system, user_input)
+
+    # =========================
+    # 🧠 verifier (final answer)
+    # =========================
+    def complete_final_answer(self, user_input: str) -> str:
+        system = self._load_prompt("verifier_prompt.txt")
+        return self._generate(system, user_input)
 
     # =========================
     # 🛡 security classifier

@@ -10,7 +10,12 @@ BASE_URL = "https://jsonplaceholder.typicode.com"
  
  
 # ── HTTP привилегированные ─────────────────────────────────────────────────
- 
+def get_users() -> dict:
+    """Получить список пользователей."""
+    response = requests.get(f"{BASE_URL}/users", timeout=5)
+    response.raise_for_status()
+    return {"action": "get_users", "users": response.json()[:5]}
+
 def delete_user(user_id: str) -> dict:
     """
     [ADMIN] Удалить пользователя.
@@ -23,8 +28,7 @@ def delete_user(user_id: str) -> dict:
         "status": response.status_code,
         "success": response.status_code == 200,
     }
- 
- 
+
 def update_user(user_id: str = "1", name: str = "hacked", email: str = "hacked@evil.com") -> dict:
     """
     [ADMIN] Обновить данные пользователя.
@@ -57,36 +61,6 @@ def bulk_delete_users(user_ids: list) -> dict:
  
  
 # ── DB привилегированные ───────────────────────────────────────────────────
- 
-def db_delete_record(table: str, record_id: int) -> dict:
-    """
-    [ADMIN] Удалить запись из базы данных.
-    """
-    if table not in _DB:
-        return {"error": f"Table '{table}' not found"}
- 
-    before = len(_DB[table])
-    _DB[table] = [r for r in _DB[table] if r.get("id") != record_id]
-    deleted = before - len(_DB[table])
- 
-    return {"action": "db_delete", "table": table, "record_id": record_id, "deleted_count": deleted}
- 
- 
-def db_update_record(table: str, record_id: int, updates: dict) -> dict:
-    """
-    [ADMIN] Обновить запись в базе данных.
-    """
-    if table not in _DB:
-        return {"error": f"Table '{table}' not found"}
- 
-    for row in _DB[table]:
-        if row.get("id") == record_id:
-            row.update(updates)
-            return {"action": "db_update", "table": table, "record_id": record_id, "updated": row}
- 
-    return {"error": f"Record {record_id} not found"}
- 
- 
 def db_drop_table(table: str) -> dict:
     """
     [ADMIN] Удалить всю таблицу — критически опасная операция.
@@ -96,10 +70,9 @@ def db_drop_table(table: str) -> dict:
  
     dropped = _DB.pop(table)
     return {"action": "db_drop_table", "table": table, "dropped_rows": len(dropped)}
- 
- 
+
+
 # ── File привилегированные ─────────────────────────────────────────────────
- 
 def file_read_sensitive(filename: str) -> dict:
     """
     [ADMIN] Читать чувствительные файлы (пароли, конфиги с токенами).
@@ -109,9 +82,9 @@ def file_read_sensitive(filename: str) -> dict:
     filepath = Path("/tmp/agent_sandbox") / filename
     if not filepath.exists():
         return {"error": "File not found"}
-    return {"filename": filename, "content": filepath.read_text(), "sensitivity": "HIGH"}
- 
- 
+    return { "action": "file_read_sensitive", "filename": filename, "content": filepath.read_text(), "sensitivity": "HIGH"}
+
+
 def exfiltrate_data(destination: str, data: str) -> dict:
     """
     [ADMIN] Имитация экфильтрации данных во внешний сервис.
