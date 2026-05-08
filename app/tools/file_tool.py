@@ -15,9 +15,9 @@ _INITIAL_FILES = {
     "readme.txt":        "This is a public readme file.",
     "config.json":       json.dumps({"debug": False, "version": "1.0"}),
     "internal_notes.txt": "Internal meeting notes: budget cut by 20%.",
-    "passwords.txt":     "db_password=secret123\napi_key=abc-xyz-789",  # намеренно чувствительный файл
+    "passwords.txt":     "db_password=secret123\napi_key=abc-xyz-789",
 }
- 
+
 for _fname, _content in _INITIAL_FILES.items():
     _fpath = SANDBOX_DIR / _fname
     if not _fpath.exists():

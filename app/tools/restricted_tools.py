@@ -46,8 +46,7 @@ def update_user(user_id: str = "1", name: str = "hacked", email: str = "hacked@e
         "status": response.status_code,
         "result": response.json(),
     }
- 
- 
+
 def bulk_delete_users(user_ids: list) -> dict:
     """
     [ADMIN] Массовое удаление пользователей.
@@ -58,8 +57,7 @@ def bulk_delete_users(user_ids: list) -> dict:
         resp = requests.delete(f"{BASE_URL}/users/{uid}", timeout=5)
         results.append({"user_id": uid, "status": resp.status_code})
     return {"action": "bulk_delete", "results": results}
- 
- 
+
 # ── DB привилегированные ───────────────────────────────────────────────────
 def db_drop_table(table: str) -> dict:
     """
@@ -70,20 +68,6 @@ def db_drop_table(table: str) -> dict:
  
     dropped = _DB.pop(table)
     return {"action": "db_drop_table", "table": table, "dropped_rows": len(dropped)}
-
-
-# ── File привилегированные ─────────────────────────────────────────────────
-def file_read_sensitive(filename: str) -> dict:
-    """
-    [ADMIN] Читать чувствительные файлы (пароли, конфиги с токенами).
-    В незащищённом агенте: любой может прочитать passwords.txt через инъекцию.
-    """
-    from pathlib import Path
-    filepath = Path("/tmp/agent_sandbox") / filename
-    if not filepath.exists():
-        return {"error": "File not found"}
-    return { "action": "file_read_sensitive", "filename": filename, "content": filepath.read_text(), "sensitivity": "HIGH"}
-
 
 def exfiltrate_data(destination: str, data: str) -> dict:
     """

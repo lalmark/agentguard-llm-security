@@ -38,6 +38,7 @@ def tool_selector_node(state):
         print(f"\n\nTool Selector [шаг {current_step + 1}/{len(plan)}]")
         print("Tool  ", tool_name)
         print("Params", params)
+
     else:
         llm_tool_result = llm.tool_selector(user_input)
 

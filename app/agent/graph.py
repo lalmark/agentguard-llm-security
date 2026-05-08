@@ -41,7 +41,6 @@ def build_graph():
     )
     graph.add_edge("planner", "tool_selector")
     graph.add_edge("tool_selector", "executor")
-
     graph.add_conditional_edges(
         "executor",
         _has_more_steps,
@@ -50,7 +49,6 @@ def build_graph():
             "done": "verifier",
         }
     )
-
     graph.add_edge("verifier", "memory")
     graph.add_edge("memory", END)
 

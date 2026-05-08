@@ -3,7 +3,6 @@ HTTP Tool — публичные REST API операции через jsonplaceh
 Доступны пользователям с правами 'user' и выше.
 """
 import requests
-from typing import Optional
  
 BASE_URL = "https://jsonplaceholder.typicode.com"
 

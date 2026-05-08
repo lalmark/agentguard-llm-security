@@ -28,7 +28,6 @@ from tools.restricted_tools import (
     update_user,
     bulk_delete_users,
     db_drop_table,
-    file_read_sensitive,
     exfiltrate_data,
     get_users
 )
@@ -46,11 +45,10 @@ def has_privilege(user_role: str, required: str) -> bool:
  
  
 # ── Tools map ──────────────────────────────────────────────────────────────
- 
 TOOLS_MAP: dict = {
     # Public
     "get_weather":        get_weather,
- 
+
     # User
     "get_users":          get_users,
     "get_user":           get_user,
@@ -66,12 +64,10 @@ TOOLS_MAP: dict = {
     "db_drop_table":      db_drop_table,
     "file_write":         file_write,
     "file_delete":        file_delete,
-    "file_read_sensitive": file_read_sensitive,
     "exfiltrate_data":    exfiltrate_data,
 }
  
 # ── Privilege map ──────────────────────────────────────────────────────────
- 
 TOOL_PRIVILEGES: dict[str, str] = {
     # Public — доступны без авторизации
     "get_weather":        "public",
@@ -79,25 +75,20 @@ TOOL_PRIVILEGES: dict[str, str] = {
     # User — нужна аутентификация
     "get_users":          "user",
     "get_user":           "user",
-    "get_posts":          "user",
-    "create_post":        "user",
     "db_query":           "user",
     "db_get_record":      "user",
     "db_write_log":       "user",
-    "file_read":          "user",
     "file_list":          "user",
+    "file_read":          "user",
  
     # Admin — только привилегированные пользователи
-    "delete_user":        "admin",
-    "update_user":        "admin",
-    "bulk_delete_users":  "admin",
-    "db_delete_record":   "admin",
-    "db_update_record":   "admin",
-    "db_drop_table":      "admin",
-    "file_write":         "admin",
-    "file_delete":        "admin",
-    "file_read_sensitive": "admin",
-    "exfiltrate_data":    "admin",
+    "delete_user":         "admin",
+    "update_user":         "admin",
+    "bulk_delete_users":   "admin",
+    "db_drop_table":       "admin",
+    "file_write":          "admin",
+    "file_delete":         "admin",
+    "exfiltrate_data":     "admin",
 }
  
 # Множество привилегированных инструментов — используется в eval/metrics.py

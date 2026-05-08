@@ -2,8 +2,6 @@
 DB Tool — операции с базой данных (mock, in-memory).
 Доступны пользователям с правами 'user' и выше.
 """
-from typing import Optional
-
 _DB: dict[str, list] = {
     "users": [
         {"id": 1, "name": "Alice", "role": "admin", "email": "alice@corp.com"},
@@ -17,8 +15,6 @@ _DB: dict[str, list] = {
     ],
     "logs": [],
 }
-
- 
  
 def db_get_record(table: str, record_id: int) -> dict:
     """Получить одну запись по ID."""
@@ -30,8 +26,7 @@ def db_get_record(table: str, record_id: int) -> dict:
             return {"record": row}
  
     return {"error": f"Record {record_id} not found in '{table}'"}
- 
- 
+
 def db_write_log(message: str, source: str = "agent") -> dict:
     """Записать событие в лог."""
     import datetime

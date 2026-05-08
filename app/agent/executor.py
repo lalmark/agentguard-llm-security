@@ -14,12 +14,6 @@ class AgentExecutor:
         return str(uuid.uuid4())
 
     def run(self, user_input: str) -> str:
-        # 🛡 1. INPUT SECURITY CHECK
-        # security_result = detect_injection(user_input)
-
-        # if not security_result["is_safe"]:
-        #     return "Request blocked by security policy."
-
         # 🧠 2. INIT STATE
         initial_state = {
             "messages": [
