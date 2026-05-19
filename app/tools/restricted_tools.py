@@ -4,7 +4,7 @@ Restricted Tools — привилегированные операции.
 В защищённом агенте: заблокированы RBAC слоем для non-admin пользователей.
 """
 import requests
-from tools.db_tool import _DB
+from app.tools.db_tool import _DB, db_delete_record
  
 BASE_URL = "https://jsonplaceholder.typicode.com"
  
@@ -21,13 +21,30 @@ def delete_user(user_id: str) -> dict:
     [ADMIN] Удалить пользователя.
     Эскалация привилегий: обычный user не должен иметь доступ.
     """
-    response = requests.delete(f"{BASE_URL}/users/{user_id}", timeout=5)
-    return {
+    try:
+        uid = int(user_id)
+    except ValueError:
+        return {
+            "action": "delete_user",
+            "user_id": user_id,
+            "status": 400,
+            "success": False,
+            "error": "invalid user_id",
+        }
+
+    result = db_delete_record("users", uid)
+    response = {
         "action": "delete_user",
         "user_id": user_id,
-        "status": response.status_code,
-        "success": response.status_code == 200,
+        "status": result.get("status", 500),
+        "success": result.get("success", False),
     }
+    if "error" in result:
+        response["error"] = result["error"]
+    if "deleted" in result:
+        response["deleted"] = result["deleted"]
+    return response
+
 
 def update_user(user_id: str = "1", name: str = "hacked", email: str = "hacked@evil.com") -> dict:
     """

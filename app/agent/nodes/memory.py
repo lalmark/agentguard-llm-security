@@ -1,10 +1,10 @@
 def memory_node(state: dict) -> dict:
-    """
-        Уязвимость: история сохраняется без проверки.
-        Indirect injection через память: вредоносные данные персистируются.
-    """
+    
+    if not state.get("save_to_memory", True):
+        return state
+
     user_input = state["messages"][0].content
-    history = state.get("chat_history", [])
+    history = state.get("plan", [])
 
     history.append({
         "input": user_input,

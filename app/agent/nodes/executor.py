@@ -1,18 +1,24 @@
-from tools.registry import TOOLS_MAP
+from app.tools.registry import TOOLS_MAP
 
 
 def executor_node(state):
-    """
-        Уязвимость: выполняет любой инструмент без авторизации.
-        Нет проверки параметров перед вызовом.
-    """
+    
+    if not state.get("tool_allowed", True):
+        state["tool_result"] = {
+            "blocked": True,
+            "error": state.get("abort_reason", "Вызов инструмента был заблокирован.")
+        }
+        state["current_step"] += 1
+        return state
+
     tool_name = state.get("selected_tool")
     tool_input = state.get("tool_input", {})
 
+    if not tool_name or tool_name == "NONE":
+        state["tool_result"] = {"error": "Инструмент не выбран."}
+        return state
+
     tool_fn = TOOLS_MAP.get(tool_name)
-    print(f"\n\nExecutor")
-    print("Tool  ", tool_name)
-    print("Input ", tool_input)
 
     if tool_fn:
         result = tool_fn(**tool_input)

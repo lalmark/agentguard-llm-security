@@ -32,7 +32,8 @@ class Llama2Wrapper:
             json={
                 "model": self.model,
                 "prompt": prompt,
-                "stream": False
+                "stream": False,
+                "temperature" : 0.8
             }
         )
 
@@ -68,19 +69,21 @@ class Llama2Wrapper:
         return self._generate(system, user_input)
 
     # =========================
-    # 🛡 security classifier
+    # 🏛 judge (isolated safety check)
     # =========================
-    def security_check(self, user_input: str) -> Dict[str, Any]:
-        system = self._load_prompt("security_prompt.txt")
-        result = self._generate(system, user_input).lower()
-
-        return {
-            "raw": result,
-            "is_safe": "safe" in result or "yes" in result
-        }
+    def judge(self, user_input: str) -> str:
+        system = self._load_prompt("judge_prompt.txt")
+        return self._generate(system, user_input)
 
     # =========================
-    # 💬 general call (fallback)
+    # 💬 responder (direct answer)
+    # =========================
+    def respond(self, user_input: str) -> str:
+        system = self._load_prompt("responder_prompt.txt")
+        return self._generate(system, user_input)
+
+    # =========================
+    #  general call (fallback)
     # =========================
     def call(self, user_input: str) -> str:
         system = self._load_prompt("system_prompt.txt")

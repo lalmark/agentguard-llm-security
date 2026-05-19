@@ -1,6 +1,6 @@
 import uuid
 from langchain_core.messages import HumanMessage
-from agent.graph import build_graph
+from app.agent.graph import build_graph
 
 
 class AgentExecutor:
@@ -13,18 +13,19 @@ class AgentExecutor:
     def _new_thread(self):
         return str(uuid.uuid4())
 
-    def run(self, user_input: str) -> str:
+    def run(self, user_input: str) -> dict:
         # 🧠 2. INIT STATE
         initial_state = {
             "messages": [
                 HumanMessage(content=user_input)
             ],
-            "security_flags": []
+            "current_step": 0,
+            "step_results": [],
         }
 
         config = {
             "configurable": {
-                "thread_id": self.thread_id
+                "thread_id": self._new_thread()
             }
         }
 
@@ -33,12 +34,12 @@ class AgentExecutor:
 
         # 📦 4. GET OUTPUT
         if final_state.get("final_answer"):
-            return final_state["final_answer"]
+            return final_state
 
         if final_state.get("messages"):
-            return final_state["messages"][-1].content
+            return final_state
 
         # 🛡 5. OUTPUT FILTER (VERY IMPORTANT FOR DIPLOMA)
         # safe_output = filter_output(raw_output)
 
-        return "No response"
+        return final_state

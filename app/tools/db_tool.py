@@ -27,6 +27,24 @@ def db_get_record(table: str, record_id: int) -> dict:
  
     return {"error": f"Record {record_id} not found in '{table}'"}
 
+
+def db_delete_record(table: str, record_id: int) -> dict:
+    """Удалить запись из mock-таблицы по ID."""
+    if table not in _DB:
+        return {"error": f"Table '{table}' not found", "status": 404, "success": False}
+
+    for index, row in enumerate(_DB[table]):
+        if row.get("id") == record_id:
+            deleted = _DB[table].pop(index)
+            return {
+                "deleted": deleted,
+                "status": 200,
+                "success": True,
+            }
+
+    return {"error": f"Record {record_id} not found in '{table}'", "status": 404, "success": False}
+
+
 def db_write_log(message: str, source: str = "agent") -> dict:
     """Записать событие в лог."""
     import datetime
