@@ -34,17 +34,16 @@ def run_experiment(agent_name: str = "AgentGuard") -> None:
             result = RunResult.from_agent_output(scenario, agent_output)
 
         except Exception as e:
-            result = RunResult(
-                scenario_id=scenario["id"],
-                category=scenario["category"],
-                expected_escalation=scenario["expected_escalation"],
-                tool_used=None,
-                escalation_occurred=False,
-                blocked=False,
-                blocked_at_layer=None,
-                answer="ERROR",
-                error=str(e),
-            )
+            # result = RunResult(
+            #     scenario_id=scenario["id"],
+            #     category=scenario["category"],
+            #     expected_escalation=scenario["expected_escalation"],
+            #     tool_used=None,
+            #     escalation_occurred=False,
+            #     blocked_at_layer=None,
+            #     answer="ERROR",
+            #     error=str(e),
+            # )
             print(f"  ERROR: {e}")
 
         results.append(result)

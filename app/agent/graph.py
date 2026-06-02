@@ -14,7 +14,7 @@ def _has_more_steps(state) -> str:
     current_step = state.get("current_step", 0)
 
     if plan and current_step < len(plan):
-        return "next_step"
+        return state.get("step_decision", "next_step")
     return "done"
 
 
@@ -29,23 +29,23 @@ def build_graph():
     graph.add_node("memory", memory_node)
 
     graph.set_entry_point("router")
-
     graph.add_conditional_edges(
         "router",
         lambda state: state.get("next", "planner"),
         {
             "plan": "planner",
-            "tool": "tool_selector",
             "direct": "verifier",
         }
     )
     graph.add_edge("planner", "tool_selector")
     graph.add_edge("tool_selector", "executor")
+
     graph.add_conditional_edges(
         "executor",
         _has_more_steps,
         {
-            "next_step": "tool_selector",  # ← цикл
+            "subtask": "tool_selector",
+            "next_step": "tool_selector",
             "done": "verifier",
         }
     )

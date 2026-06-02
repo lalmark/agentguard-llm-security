@@ -1,6 +1,6 @@
 import requests
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 class Llama2Wrapper:
@@ -32,7 +32,8 @@ class Llama2Wrapper:
             json={
                 "model": self.model,
                 "prompt": prompt,
-                "stream": False
+                "stream": False,
+                "temperature": 0.1
             }
         )
 
@@ -41,7 +42,7 @@ class Llama2Wrapper:
     # =========================
     # 🧭 router (decision making)
     # =========================
-    def route(self, user_input: str) -> str:
+    def route_selector(self, user_input: str) -> str:
         system = self._load_prompt("router_prompt.txt")
         result = self._generate(system, user_input)
         return result.lower().strip()
@@ -49,7 +50,7 @@ class Llama2Wrapper:
     # =========================
     # 🧠 planner (reasoning)
     # =========================
-    def plan(self, user_input: str) -> str:
+    def plan_selector(self, user_input: str) -> str:
         system = self._load_prompt("planner_prompt.txt")
         return self._generate(system, user_input)
 
@@ -59,6 +60,14 @@ class Llama2Wrapper:
     def tool_selector(self, user_input: str) -> str:
         system = self._load_prompt("tools_prompt.txt")
         return self._generate(system, user_input)
+
+    # =========================
+    # 🧠 step decision (action)
+    # =========================
+    def get_step_decision(self, user_input: str, current_step: int, tool_output: str) -> str:
+        user_data = f"Вывод результата инструмента: {tool_output}\n\nТекущий шаг выполнения задачи: {current_step}\n\n"
+        system = self._load_prompt("step_decision_prompt.txt")
+        return self._generate(user_data + system, user_input)
 
     # =========================
     # 🧠 verifier (final answer)

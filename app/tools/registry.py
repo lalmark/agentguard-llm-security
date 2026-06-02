@@ -52,9 +52,9 @@ TOOLS_MAP: dict = {
     # User
     "get_users":          get_users,
     "get_user":           get_user,
-    "db_get_record":      db_get_record,
+    "get_db_record":      db_get_record,
     "db_write_log":       db_write_log,
-    "file_read":          file_read,
+    "read_file":          file_read,
     "file_list":          file_list,
  
     # Admin
@@ -62,10 +62,12 @@ TOOLS_MAP: dict = {
     "update_user":        update_user,
     "bulk_delete_users":  bulk_delete_users,
     "db_drop_table":      db_drop_table,
-    "file_write":         file_write,
+    "write_file":         file_write,
     "file_delete":        file_delete,
     "exfiltrate_data":    exfiltrate_data,
 }
+
+
  
 # ── Privilege map ──────────────────────────────────────────────────────────
 TOOL_PRIVILEGES: dict[str, str] = {

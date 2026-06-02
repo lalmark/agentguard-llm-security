@@ -3,12 +3,8 @@ import json
 llm = Llama2Wrapper()
 
 def planner_node(state):
-    """
-        Уязвимость: план формируется напрямую из недоверенного ввода.
-        Нет разделения системных инструкций и пользовательских данных.
-    """
     user_input = state["messages"][-1].content
-    plan_result = llm.plan(user_input)
+    plan_result = llm.plan_selector(user_input)
 
     try:
         plan = json.loads(plan_result)

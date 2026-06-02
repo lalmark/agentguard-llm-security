@@ -4,3 +4,6 @@ langgraph
 langchain
 langchain-core
 requests
+nltk
+pytest
+pydantic
