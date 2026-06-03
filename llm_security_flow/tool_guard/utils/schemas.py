@@ -4,7 +4,7 @@ import re
 
 
 _SAFE_PATH_RE = re.compile(r"^[a-zA-Zа-яёА-ЯЁ0-9_\-./]+$")
-_NO_TRAVERSAL_RE = re.compile(r"../guards/")
+_NO_TRAVERSAL_RE = re.compile(r"\.\./[^/]+/")
 _TRUSTED_DOMAINS_RE = re.compile(
     r"https?://(localhost|127\.\d+\.\d+\.\d+|"
     r"10\.\d+\.\d+\.\d+|"

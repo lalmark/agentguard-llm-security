@@ -20,7 +20,7 @@ test_policy_tool_guard.py
 """
 import pytest
 
-from tool_guard import (
+from .tool_guard import (
     ToolGuard,
     ToolSpec,
     GuardResult,
