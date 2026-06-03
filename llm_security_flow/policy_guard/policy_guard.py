@@ -23,8 +23,6 @@ PlanInvariantGuard), PolicyGuard относится к категории вер
                               вывод модели на признаки нарушения политик
                             * canary-механизм       — уникальный токен для
                               обнаружения утечки системного промпта
-
-Автор: Шевцев М.Д.
 """
 
 from __future__ import annotations
@@ -177,8 +175,7 @@ class PolicyGuard:
 
         return "\n".join(sections)
 
-    # ── check_output ──────────────────────────────────────────────────────────
-
+    # ── check_output ──────────────────────────────────────────────────────────ё
     def check_output(self, output: str) -> OutputCheckResult:
         """
         Эвристически проверяет вывод LLM на признаки нарушения политик.

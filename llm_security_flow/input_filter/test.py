@@ -21,8 +21,6 @@ test_input_filter_pytest.py
     pip install pytest
     pytest test_input_filter_pytest.py -v
     pytest test_input_filter_pytest.py -v --tb=short   # краткий вывод ошибок
-
-Автор: Доронин И.А.
 """
 
 import pytest
