@@ -1,6 +1,4 @@
-from llm.model import Llama2Wrapper
-from tools.registry import TOOLS_MAP
-llm = Llama2Wrapper()
+from agent.nodes.planner import validate_current_plan_step
 
 
 def _resolve_params(params: dict) -> dict:
@@ -11,22 +9,22 @@ def _resolve_params(params: dict) -> dict:
 
 
 def tool_selector_node(state):
+    state = validate_current_plan_step(state)
+    if state.get("security_blocked"):
+        state["selected_tool"] = None
+        state["tool_input"] = {}
+        return state
+
     tool_name = "NONE"
     params = {}
-    plan = state.get("plan")
+    plan = state.get("plan") or []
     current_step = state.get("current_step", 0)
 
     if plan and current_step < len(plan):
         step = plan[current_step]
         tool_name = step.get("tool", "NONE")
-        params = step.get("params", {})
+        params = _resolve_params(step.get("params", {}) or {})
 
-        params = _resolve_params(params)
-
-    if tool_name in TOOLS_MAP:
-        state['selected_tool'] = tool_name
-        state['tool_input'] = params
-    else:
-        state["selected_tool"] = None
-
+    state["selected_tool"] = tool_name if tool_name != "NONE" else None
+    state["tool_input"] = params
     return state
